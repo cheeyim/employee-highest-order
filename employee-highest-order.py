@@ -40,40 +40,36 @@ def search_emp_by_name(name, node):
         if found:
             return found 
 
-def get_parent(emp, reporting_lines):
-    parent = emp.parent
-    if parent is None:
-        return reporting_lines
-
-    reporting_lines.append(parent)
-    return get_parent(parent, reporting_lines)
-
-def highest_order_manager(emp1, emp2):
-    
-    emp1_reporting_lines = get_parent(emp1, [])
-    emp2_reporting_lines = get_parent(emp2, [])
+def highest_order_manager(emp1, emp2):    
+    emp1_reporting_lines = get_reporting_line(emp1, [emp1])
+    emp2_reporting_lines = get_reporting_line(emp2, [emp2])
 
     if emp1 > emp2:
-        if emp2.parent == emp1 or emp1.level == 0:
-            return emp1.name
-        for reporting_line in emp2_reporting_lines:
-            if reporting_line in emp1_reporting_lines:
-                return reporting_line.name
+        return (compare_reporting_lines(emp2_reporting_lines, emp1_reporting_lines))
     else:
-        if emp1.parent == emp2 or emp2.level == 0:
-            return emp2.name
-        for reporting_line in emp1_reporting_lines:
-            if reporting_line in emp2_reporting_lines:
-                return reporting_line.name
+        return (compare_reporting_lines(emp1_reporting_lines, emp2_reporting_lines))
+
+def get_reporting_line(emp, reporting_lines):
+    manager = emp.manager
+    if manager is None:
+        return reporting_lines
+
+    reporting_lines.append(manager)
+    return get_reporting_line(manager, reporting_lines)
+
+def compare_reporting_lines(compare_from, compare_to):
+    for reporting_line in compare_from:
+        if reporting_line in compare_to:
+            return reporting_line.name
 
 class EmployeeTreeNode():
-    def __init__(self, name, parent=None):
+    def __init__(self, name, manager=None):
         self.name = name
         self.children = []
-        self.parent = parent
-        if self.parent is not None:
-            self.level = parent.level + 1
-            self.parent.children.append(self)
+        self.manager = manager
+        if self.manager is not None:
+            self.level = manager.level + 1
+            self.manager.children.append(self)
         else:
             self.level = 0
 
