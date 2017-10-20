@@ -40,19 +40,31 @@ def search_emp_by_name(name, node):
         if found:
             return found 
 
+def get_parent(emp, reporting_lines):
+    parent = emp.parent
+    if parent is None:
+        return reporting_lines
+
+    reporting_lines.append(parent)
+    return get_parent(parent, reporting_lines)
+
 def highest_order_manager(emp1, emp2):
+    
+    emp1_reporting_lines = get_parent(emp1, [])
+    emp2_reporting_lines = get_parent(emp2, [])
+
     if emp1 > emp2:
         if emp2.parent == emp1 or emp1.level == 0:
             return emp1.name
-        else:
-            return emp1.parent.name  
-    elif emp2 > emp1:
+        for reporting_line in emp2_reporting_lines:
+            if reporting_line in emp1_reporting_lines:
+                return reporting_line.name
+    else:
         if emp1.parent == emp2 or emp2.level == 0:
             return emp2.name
-        else:
-            return emp2.parent.name
-    # both employees has the same manager
-    return emp1.parent.name
+        for reporting_line in emp1_reporting_lines:
+            if reporting_line in emp2_reporting_lines:
+                return reporting_line.name
 
 class EmployeeTreeNode():
     def __init__(self, name, parent=None):
